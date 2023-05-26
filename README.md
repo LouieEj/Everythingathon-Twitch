@@ -7,7 +7,7 @@ An Everythingathon is similar to a Subathon, but in a Subathon only subscription
 1. Download Node.js using the [installer on their website.](https://nodejs.org/en/download)
 2. [Download the source code](https://github.com/LouieEj/Everythingathon-Twitch/archive/refs/heads/main.zip) for Everythingathon-Twitch.
 3. Extract the files into a single folder.
-4. Open a command prompt window in this directory (Shift + Right Click in the folder is an easy way to do this), and then type ```node npm install```.
+4. Open a command prompt window in this directory (Shift + Right Click in the folder is an easy way to do this), and then type `npm install`.
 5. Open the `.env` file in a text editor program and set all attributes to the required values.
 
 # CONFIGURATION
@@ -38,5 +38,5 @@ An Everythingathon is similar to a Subathon, but in a Subathon only subscription
 
 # RUNNING THE TIMER
 - Go to the directory of the timer and open a command prompt/terminal window.
-- Type ```node node index.js``` and the timer should start running.
+- Type `node index.js` and the timer should start running.
 - If you ever need to stop the timer, you can press Control + C in the terminal window.
