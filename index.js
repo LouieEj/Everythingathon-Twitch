@@ -7,7 +7,7 @@ const channelToMonitor = 'louieejay';
 const followersIDCSV = 'followersID.csv'; //CSV file should be downloaded just before start of Everythingathon
                                         //can be downloaded from: https://twitch-tools.rootonline.de/followerlist_viewer.php
 const moderatorID = '783929864'; //a moderator's ID is needed to be able to subscribe to event subs
-                                 //can be fetched using: https://twitch-tools.rootonline.de/followerlist_viewer.php
+                                 //can be fetched using: https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
 
 //Configure the amount of seconds each event adds to the timer
 const followersTime = 60; //60 seconds add to the timer when someone new follows
