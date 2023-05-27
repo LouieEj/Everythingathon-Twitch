@@ -393,7 +393,7 @@ async function readFollowersID(followerID, followerUsername){
         fs.createReadStream(followersIDCSV)
         .pipe(csv())
         .on('data', (row) => {
-          if (row.ID == followerID){
+          if (row.userID == followerID){
             //new follower has already followed (their ID is in the CSV file)
             found = true;
           }
