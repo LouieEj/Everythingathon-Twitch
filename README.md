@@ -59,6 +59,15 @@ An Everythingathon is similar to a Subathon, but in a Subathon only subscription
 - NOTE: If the timer ever hits 0, the timer will stay at 0, even if the value in `time.txt` increases.
   - To force the timer to update in a situation like this, right click the Browser source, click `Properties`, scroll down and click `Refresh cache of current page`.
 
+## UPDATE followersID.csv FILE
+- Just before starting a proper Everythingathon, the followersID.csv file should be updated.
+- To do this, delete the existing one, and then head to [this website](https://twitch-tools.rootonline.de/followerlist_viewer.php).
+  - Enter the name of the channel which the Everythingathon is happening on, and then wait for the followers list to be generated.
+  - Once the button shows, click on `Export all as CSV`.
+- Once downloaded, open the CSV file in Microsoft Excel (or a similar program) and delete all the rows other than the `userID` row.
+- Save the file in the Everythingathon-Twitch directory, and rename the file to `followersID.csv`.
+  - If, for whatever reason, you cannot name the file this, call it something else and then update the constant `followersIDCSV` in `index.js` accordingly.
+
 ## RUNNING THE TIMER
 - Go to the directory of the timer and open a command prompt/terminal window.
 - Type `node index.js` and the timer should start running.
