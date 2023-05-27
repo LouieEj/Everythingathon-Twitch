@@ -1,0 +1,9 @@
+!starttimer - start the timer, if it is paused -- timer started by default
+!pausetimer - pause the timer, if it is running
+!settimer <DD:HH:MM:SS> (e.g. !settime 01:02:12:58) - sets the timer's time to the one provided - MUST follow format DD:HH:MM:SS
+!addmins <minutes> - use to add minutes (integer) to the timer
+!addsecs <seconds> - use to add seconds (integer) to the timer
+!subtractmins <minutes> - use to subtract minutes (integer) from the timer
+!subtractsecs <seconds> - use to subtract seconds (integer) from the timer
+!followbots <number_of_bots> - use to subtract the amount of time that was added from X number of follow bots
+!setspeed <seconds> - use to set how quickly the timer
