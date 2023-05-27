@@ -63,3 +63,4 @@ An Everythingathon is similar to a Subathon, but in a Subathon only subscription
 - Go to the directory of the timer and open a command prompt/terminal window.
 - Type `node index.js` and the timer should start running.
 - If you ever need to stop the timer, you can press Control + C in the terminal window.
+- When running the bot for an actual Everythingathon, and not for testing, you should set the value for `DEBUG_MODE` near the top of `index.js` to false.

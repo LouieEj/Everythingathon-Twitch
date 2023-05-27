@@ -20,7 +20,7 @@ const donation1PoundTime = 60; //1 minute for £1 donated - scales with amount d
 const minimumDonationAmountToAddTime = 0; //Only adds time to the timer when more than this amount has been added...
                                           //..by default, there is no minimum, so even if a user donates £0.01, 1 second will be added
 
-
+const DEBUG_MODE = true;
 
 //------------------------- CODE -------------------------//
 require("dotenv").config();
@@ -60,20 +60,13 @@ tmi.on('chat', (channel, userstate, message, self) => {
         if (message.split(' ')[0] == "!everythingathon"){
             if (message.split(' ').length > 1){
                 if (message.split(' ')[1].toLowerCase() == "help" || message.split(' ')[1].toLowerCase() == "h"){
-                    console.log(
-                        `!starttimer - start the timer, if it is paused -- timer started by default\n
-                        !pausetimer - pause the timer, if it is running\n
-                        !settimer <DD:HH:MM:SS> (e.g. !settime 01:02:12:58) - sets the timer's time to the one provided - MUST follow format DD:HH:MM:SS\n
-                        !addmins <minutes> - use to add minutes (integer) to the timer\n
-                        !addsecs <seconds> - use to add seconds (integer) to the timer\n
-                        !subtractmins <minutes> - use to subtract minutes (integer) from the timer\n
-                        !subtractsecs <seconds> - use to subtract seconds (integer) from the timer\n
-                        !followbots <number_of_bots> - use to subtract the amount of time that was added from X number of follow bots\n
-                        !setspeed <seconds> - use to set how quickly the timer\n`);
+                    if (DEBUG_MODE) console.log(`A list of commands can be found here: https://raw.githubusercontent.com/LouieEj/Everythingathon-Twitch/main/BotCommands.txt`);
+                    else tmi.say(channel, `A list of commands can be found here: https://raw.githubusercontent.com/LouieEj/Everythingathon-Twitch/main/BotCommands.txt`)
                 }
             }
             else{
-                tmi.say(channel, "Everythingathon Bot is awake! To get help with the bot, use: !everythingathon help");
+                if (DEBUG_MODE) console.log("Everythingathon Bot is awake! To get help with the bot, use: !everythingathon help");
+                else tmi.say(channel, "Everythingathon Bot is awake! To get help with the bot, use: !everythingathon help");
             }
             console.log("Bot is awake!");
         }
@@ -81,13 +74,15 @@ tmi.on('chat', (channel, userstate, message, self) => {
         //!starttimer - start the timer, if it is paused
         if (message == "!starttimer"){
             timeScript.startTimer();
-            tmi.say(channel, "Timer started!");
+            if (DEBUG_MODE) console.log("Timer started!");
+            else tmi.say(channel, "Timer started!");
         }
 
         //!pausetimer - pause the timer, if it is running
         if (message == "!pausetimer"){
             timeScript.pauseTimer();
-            tmi.say(channel, "Timer paused!");
+            if (DEBUG_MODE) console.log("Timer paused!");
+            else tmi.say(channel, "Timer paused!");
         }
 
         //!settime <DD:HH:MM:SS> - sets the timer's time to the one provided
@@ -102,14 +97,17 @@ tmi.on('chat', (channel, userstate, message, self) => {
 
                     let totalSeconds = (days * 86400) + (hours * 3600) + (mins * 60) + seconds;
                     timeScript.setTimer(totalSeconds);
-                    tmi.say(channel, `Updated the timer to ${timerTime} successfully!`);
+                    if (DEBUG_MODE) console.log(`Updated the timer to ${timerTime} successfully!`);
+                    else tmi.say(channel, `Updated the timer to ${timerTime} successfully!`);
                 }
                 else{
-                    tmi.say(channel, "Please input a valid time in the format DD:HH:MM:SS");
+                    if (DEBUG_MODE) console.log("Please input a valid time in the format DD:HH:MM:SS");
+                    else tmi.say(channel, "Please input a valid time in the format DD:HH:MM:SS");
                 }
             }
             catch{
-                tmi.say(channel, "Please input a valid time in the format DD:HH:MM:SS");
+                if (DEBUG_MODE) console.log("Please input a valid time in the format DD:HH:MM:SS")
+                else tmi.say(channel, "Please input a valid time in the format DD:HH:MM:SS");
             }
         }
 
@@ -121,14 +119,17 @@ tmi.on('chat', (channel, userstate, message, self) => {
                 if (Number.isInteger(minutes)){
                     let seconds = minutes * 60;
                     addToTimer(seconds);
-                    tmi.say(channel, `Added ${minutes} minutes to the timer!`);
+                    if (DEBUG_MODE) console.log(`Added ${minutes} minutes to the timer!`);
+                    else tmi.say(channel, `Added ${minutes} minutes to the timer!`);
                 }
                 else{
-                    tmi.say(channel, "USER ERROR: Please input a valid number for minutes!");
+                    if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for minutes!");
+                    else tmi.say(channel, "USER ERROR: Please input a valid number for minutes!");
                 }
             }
             catch{
-                tmi.say(channel, "SYSTEM ERROR: Please input a valid number for minutes!");
+                if (DEBUG_MODE) console.log("SYSTEM ERROR: Please input a valid number for minutes!");
+                else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for minutes!");
             }
         }
 
@@ -138,14 +139,17 @@ tmi.on('chat', (channel, userstate, message, self) => {
                 let seconds = parseInt(message.split(' ')[1]);
                 if (Number.isInteger(seconds)){
                     addToTimer(seconds);
-                    tmi.say(channel, `Added ${seconds} seconds to the timer!`)
+                    if (DEBUG_MODE) console.log(`Added ${seconds} seconds to the timer!`);
+                    else tmi.say(channel, `Added ${seconds} seconds to the timer!`)
                 }
                 else{
-                    tmi.say(channel, "USER ERROR: Please input a valid number for seconds!");
+                    if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for seconds!");
+                    else tmi.say(channel, "USER ERROR: Please input a valid number for seconds!");
                 }
             }
             catch{
-                tmi.say(channel, "SYSTEM ERROR: Please input a valid number for seconds!");
+                if (DEBUG_MODE) console.log("SYSTEM ERROR: Please input a valid number for seconds!");
+                else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for seconds!");
             }
         }
 
@@ -157,14 +161,17 @@ tmi.on('chat', (channel, userstate, message, self) => {
                 if (Number.isInteger(minutes)){
                     let seconds = minutes * 60;
                     addToTimer(Math.abs(seconds) * -1);
-                    tmi.say(channel, `Subtracted ${minutes} minutes from the timer!`);
+                    if (DEBUG_MODE) console.log(`Subtracted ${minutes} minutes from the timer!`);
+                    else tmi.say(channel, `Subtracted ${minutes} minutes from the timer!`);
                 }
                 else{
-                    tmi.say(channel, "USER ERROR: Please input a valid number for minutes!");
+                    if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for minutes!");
+                    else tmi.say(channel, "USER ERROR: Please input a valid number for minutes!");
                 }
             }
             catch{
-                tmi.say(channel, "SYSTEM ERROR: Please input a valid number for minutes!");
+                if (DEBUG_MODE) console.log("SYSTEM ERROR: Please input a valid number for minutes!");
+                else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for minutes!");
             }
         }
 
@@ -174,14 +181,17 @@ tmi.on('chat', (channel, userstate, message, self) => {
                 let seconds = parseInt(message.split(' ')[1]);
                 if (Number.isInteger(seconds)){
                     addToTimer(Math.abs(seconds) * -1);
-                    tmi.say(channel, `Subtracted ${seconds} seconds from the timer!`)
+                    if (DEBUG_MODE) console.log(`Subtracted ${seconds} seconds from the timer!`);
+                    else tmi.say(channel, `Subtracted ${seconds} seconds from the timer!`)
                 }
                 else{
-                    tmi.say(channel, "USER ERROR: Please input a valid number for seconds!");
+                    if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for seconds!");
+                    else tmi.say(channel, "USER ERROR: Please input a valid number for seconds!");
                 }
             }
             catch{
-                tmi.say(channel, "SYSTEM ERROR: Please input a valid number for seconds!");
+                if (DEBUG_MODE) console.log("SYSTEM ERROR: Please input a valid number for seconds!");
+                else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for seconds!");
             }
 
         }
@@ -193,14 +203,17 @@ tmi.on('chat', (channel, userstate, message, self) => {
                 if (Number.isInteger(numOfFollowers)){
                     let seconds = followersTime * numOfFollowers;
                     addToTimer(Math.abs(seconds) * -1);
-                    tmi.say(channel, `Subtracted ${seconds} seconds from the timer, equivalent of ${numOfFollowers} follows!`)
+                    if (DEBUG_MODE) console.log(`Subtracted ${seconds} seconds from the timer, equivalent of ${numOfFollowers} follows!`);
+                    else tmi.say(channel, `Subtracted ${seconds} seconds from the timer, equivalent of ${numOfFollowers} follows!`)
                 }
                 else{
-                    tmi.say(channel, "USER ERROR: Please input a valid number for number of bots followed!");
+                    if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for number of bots followed!");
+                    else tmi.say(channel, "USER ERROR: Please input a valid number for number of bots followed!");
                 }
             }
             catch{
-                tmi.say(channel, "SYSTEM ERROR: Please input a valid number for number of bots followed!");
+                if (DEBUG_MODE) console.log("SYSTEM ERROR: Please input a valid number for number of bots followed!");
+                else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for number of bots followed!");
             }
         }
 
@@ -214,15 +227,17 @@ tmi.on('chat', (channel, userstate, message, self) => {
                     run = setInterval(() => {
                         timeScript.updateTime();
                     }, timerSpeed);
-                    tmi.say(channel, `Success! Timer will now go down 1 second every ${speed} second(s).`)
+                    if (DEBUG_MODE) console.log(`Success! Timer will now go down 1 second every ${speed} second(s).`);
+                    else tmi.say(channel, `Success! Timer will now go down 1 second every ${speed} second(s).`)
                 }
                 else{
-                    tmi.say(channel, "USER ERROR: Please input a valid number for the speed to decrease a second from the timer!");
+                    if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for the speed to decrease a second from the timer!");
+                    else tmi.say(channel, "USER ERROR: Please input a valid number for the speed to decrease a second from the timer!");
                 }
             }
             catch{
-                tmi.say(channel, "SYSTEM ERROR: Please input a valid number for the speed to decrease a second from the timer!");
-                console.log(channel, "SYSTEM ERROR: Please input a valid number for the speed to decrease a second from the timer!");
+                if (DEBUG_MODE) console.log("SYSTEM ERROR: Please input a valid number for the speed to decrease a second from the timer!");
+                else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for the speed to decrease a second from the timer!");
             }
         }
     }
@@ -371,6 +386,7 @@ function startListener(){
 var found = false;
 const csv = require('csv-parser');
 const fs = require('fs');
+const { debug } = require("console");
 async function readFollowersID(followerID, followerUsername){
     console.log(`   Attempting to read followers ID from ${followersIDCSV}...`)
     try{
