@@ -4,11 +4,34 @@ The stream lasts as long as the timer does not hit 0, and different events adds 
 An Everythingathon is similar to a Subathon, but in a Subathon only subscriptions add time to the timer, whereas in an Everythingathon other events add time too (following, cheering bits, donating, raiding).
 
 ## SETUP
+## Create a Twitch Application
+1. Head to [Twitch Developer Console Portal](https://dev.twitch.tv/console) and log in with your Twitch details.
+2. Create an application by clicking `Register Your Application` from the `Dashboard` page.
+3. Give the application a name and select `Chat Bot` as the category.
+4. For the OAuth Redirect URL, enter `https://twitchapps.com/tokengen/`
+5. Click `Create` to finish creating the Twitch application.
+
+## Setup Node.js and download the source code
 1. Download Node.js using the [installer on their website.](https://nodejs.org/en/download)
 2. [Download the source code](https://github.com/LouieEj/Everythingathon-Twitch/archive/refs/heads/main.zip) for Everythingathon-Twitch.
 3. Extract the files into a single folder.
 4. Open a command prompt window in this directory (Shift + Right Click in the folder is an easy way to do this), and then type `npm install`.
-5. Open the `.env` file in a text editor program and set all attributes to the required values.
+
+## Setup the variables in .env file
+1. Open the `.env` file, in the Everythingathon-Twitch directory, in a text editor.
+2. To get `TMI_PASSWORD`: 
+  - Go to [this website](https://twitchapps.com/tmi/) and click `Connect`.
+  - Copy the provided OAuth password (e.g. `oauth:c6ababco2v8120abcd5ei3f315g5h`) and paste it in the speech marks for `TMI_PASSWORD` in the `.env` file.
+3. To get `CLIENT_ID`:
+  - Go to the [Twitch Developer Console Portal](https://dev.twitch.tv/console), find your Application, and click `Manage`.
+  - Copy the value for `Client ID` (e.g. `ab5cd4efghij355kl6m1nop4q7038r`) and paste it in the speech marks for `CLIENT_ID` in the `.env` file.
+4. To get `ACCESS_TOKEN`:
+  - Go to [this website](https://twitchapps.com/tokengen/) and paste the Client ID you have previously found (step 3) in the appropriate input box.
+  - In the scopes input box, enter: `moderator:read:followers bits:read channel:read:subscriptions` (make sure they are separated by spaces as shown).
+  - Click connect, and then copy the provided Access Token (e.g. `a2bcd5efg1hijklmn3o2pqrstu2v2w`) into the speech marks for `ACCESS_TOKEN` in the `.env` file.
+5. To get `SOCKET_TOKEN`:
+  - Go to [Streamlabs API Settings page](https://streamlabs.com/dashboard#/settings/api-settings) and then click on `API Tokens`.
+  - Copy the Socket API Token (it is very long, so no example given) and paste it in the speech marks for `SOCKET_TOKEN` in the `.env` file.
 
 ## CONFIGURATION
 ### Initial time

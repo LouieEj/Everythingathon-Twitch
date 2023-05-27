@@ -3,7 +3,7 @@
 
 //------------------------- GLOBAL VARIABLES TO EDIT -------------------------//
 //scopes: moderator:read:followers bits:read channel:read:subscriptions
-const channelToMonitor = 'louieejay';
+const channelToMonitor = 'fulham';
 const followersIDCSV = 'followersID.csv'; //CSV file should be downloaded just before start of Everythingathon
                                         //can be downloaded from: https://twitch-tools.rootonline.de/followerlist_viewer.php
 const moderatorID = '783929864'; //a moderator's ID is needed to be able to subscribe to event subs
@@ -48,7 +48,7 @@ const tmi = new tmiLib.Client({
     channels: [channelToMonitor],
     identity:{
         username: channelToMonitor,
-        password: `oauth:${process.env.TMI_PASSWORD}`
+        password: `${process.env.TMI_PASSWORD}`
     },
     options: {debug: true}
 })
