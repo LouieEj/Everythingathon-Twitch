@@ -27,7 +27,7 @@ An Everythingathon is similar to a Subathon, but in a Subathon only subscription
   - Copy the value for `Client ID` (e.g. `ab5cd4efghij355kl6m1nop4q7038r`) and paste it in the speech marks for `CLIENT_ID` in the `.env` file.
 4. To get `ACCESS_TOKEN`:
   - Go to [this website](https://twitchapps.com/tokengen/) and paste the Client ID you have previously found (step 3) in the appropriate input box.
-  - In the scopes input box, enter: `moderator:read:followers bits:read channel:read:subscriptions` (make sure they are separated by spaces as shown).
+  - In the scopes input box, enter: `moderator:read:followers bits:read channel:read:subscriptions channel:read:redemptions channel:manage:redemptions` (make sure they are separated by spaces as shown).
   - Click connect, and then copy the provided Access Token (e.g. `a2bcd5efg1hijklmn3o2pqrstu2v2w`) into the speech marks for `ACCESS_TOKEN` in the `.env` file.
 5. To get `SOCKET_TOKEN`:
   - Go to [Streamlabs API Settings page](https://streamlabs.com/dashboard#/settings/api-settings) and then click on `API Tokens`.
