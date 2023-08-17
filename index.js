@@ -2,11 +2,11 @@
 
 
 //------------------------- GLOBAL VARIABLES TO EDIT -------------------------//
-//scopes: moderator:read:followers bits:read channel:read:subscriptions
-const channelToMonitor = 'fulham';
+//scopes: moderator:read:followers bits:read channel:read:subscriptions channel:read:redemptions channel:manage:redemptions
+const channelToMonitor = 'louieej';
 const followersIDCSV = 'followersID.csv'; //CSV file should be downloaded just before start of Everythingathon
                                         //can be downloaded from: https://twitch-tools.rootonline.de/followerlist_viewer.php
-const moderatorID = '783929864'; //a moderator's ID is needed to be able to subscribe to event subs
+const moderatorID = '152929203'; //a moderator's ID is needed to be able to subscribe to event subs
                                  //can be fetched using: https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
 
 //Configure the amount of seconds each event adds to the timer
@@ -19,11 +19,14 @@ const secondsPerViewerFromRaid = 1; //1 second gets added to the timer per viewe
 const donation1PoundTime = 60; //1 minute for £1 donated - scales with amount donated, e.g. £5 donated will be 5 mins, £10 will be 10 mins, etc
 const minimumDonationAmountToAddTime = 0; //Only adds time to the timer when more than this amount has been added...
                                           //..by default, there is no minimum, so even if a user donates £0.01, 1 second will be added
+const customRewardTitle = 'Add 1 minute to timer'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
+const customRewardCost = 1000; //Cost for the custom channel point reward, in channel points
+const customRewardTime = 60; //1 minute for channel point reward redemption.
 
 const DEBUG_MODE = true;
 
 //------------------------- CODE -------------------------//
-require("dotenv").config();
+require("dotenv/config");
 
 // ----- GLOBAL VARIABLES DO NOT EDIT ----- //
 var timerSpeed = 1000;
@@ -31,7 +34,7 @@ var timerSpeed = 1000;
 //Add time function
 const timeScript = require('./timeScript');
 function addToTimer(time){
-    timeScript.addTime(time);
+    timeScript.addTime(time + 1); //1 second added to any time so actual time gets added (as 1 second will pass before gets triggered)
 }
 
 //Update time loop (every X seconds, determined by timerSpeed [default = 1000ms/1 second])
@@ -308,6 +311,7 @@ var accessToken = process.env.ACCESS_TOKEN;
 var userID = '';
 function getID(){
     console.log(`Attempting to get user ID for ${channelToMonitor}...`)
+    console.log(`Access Token: ${accessToken}\nClient ID: ${process.env.CLIENT_ID}`)
     request(`https://api.twitch.tv/helix/users?login=${channelToMonitor}`, {
         headers: {
         'Authorization': 'Bearer ' + accessToken,
@@ -330,10 +334,10 @@ getID(); //Initial function call to start follower monitoring
 //...for authentication,
 const twurpleAuth = require('@twurple/auth');
 const authProvider = new twurpleAuth.StaticAuthProvider(process.env.CLIENT_ID, process.env.ACCESS_TOKEN);
-//for the Twitch API communication,
+//...for the Twitch API communication,
 const twurpleApi = require('@twurple/api');
 const apiClient = new twurpleApi.ApiClient({authProvider});
-//for Twitch API Event Sub endpoints.
+//...for Twitch API Event Sub endpoints.
 const twurpleEventSub = require('@twurple/eventsub-ws');
 const listener = new twurpleEventSub.EventSubWsListener({apiClient});
 
@@ -355,13 +359,13 @@ function startListener(){
     // ---- SUB EVENT ---- //
     listener.onChannelSubscription(userID, moderatorID, e =>{
         console.log(`TWURPLE: ${e.userDisplayName} (${e.userId}) just subscribed with tier: ${e.tier}`);
-        if (e.tier == 1000){
+        if (e.tier == 1000){ //tier 1 = 1000
             addToTimer(tier1SubsTime);
         }
-        if (e.tier == 2000){
+        if (e.tier == 2000){ //tier 2 = 2000
             addToTimer(tier2SubsTime);
         }
-        if (e.tier == 3000){
+        if (e.tier == 3000){ //tier 3 = 3000
             addToTimer(tier3SubsTime);
         }
     })
@@ -370,6 +374,14 @@ function startListener(){
     listener.onChannelRaidFrom(userID, moderatorID, e =>{
         console.log(`TWURPLE: ${e.userDisplayName} (${e.userId}) just raided with ${e.viewers} viewers!`);
         addToTimer(secondsPerViewerFromRaid * e.viewers);
+    })
+
+    
+    // ---- CHANNEL POINT EVENT ---- //
+    listener.onChannelRedemptionAdd(userID, e =>{
+        if(e.rewardTitle == customRewardTitle && e.rewardCost == customRewardCost){ //title and cost is used to verify the channel point reward
+            addToTimer(customRewardTime);
+        }
     })
 
     listener.start();
