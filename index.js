@@ -6,7 +6,7 @@
 const channelToMonitor = 'louieej';
 const followersIDCSV = 'followersID.csv'; //CSV file should be downloaded just before start of Everythingathon
                                         //can be downloaded from: https://twitch-tools.rootonline.de/followerlist_viewer.php
-const moderatorID = '152929203'; //a moderator's ID is needed to be able to subscribe to event subs
+const moderatorID = '909337288'; //a moderator's ID is needed to be able to subscribe to event subs
                                  //can be fetched using: https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
 
 //Configure the amount of seconds each event adds to the timer
@@ -23,7 +23,7 @@ const customRewardTitle = 'Add 1 minute to timer'; //Name for a custom channel p
 const customRewardCost = 1000; //Cost for the custom channel point reward, in channel points
 const customRewardTime = 60; //1 minute for channel point reward redemption.
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 //------------------------- CODE -------------------------//
 require("dotenv/config");
@@ -57,8 +57,8 @@ const tmi = new tmiLib.Client({
 })
 
 // ----- COMMANDS ----- //
-tmi.on('chat', (channel, userstate, message, self) => {
-    if (!self && userstate.mod){
+tmi.on('chat', (channel, tags, message) => {
+    if (tags.badges.broadcaster || tags.badges.moderator){
         //Check that bot is awake, or get help
         if (message.split(' ')[0] == "!everythingathon"){
             if (message.split(' ').length > 1){
@@ -75,14 +75,14 @@ tmi.on('chat', (channel, userstate, message, self) => {
         }
 
         //!starttimer - start the timer, if it is paused
-        if (message == "!starttimer"){
+        if (message.split(' ')[0] == "!starttimer"){
             timeScript.startTimer();
             if (DEBUG_MODE) console.log("Timer started!");
             else tmi.say(channel, "Timer started!");
         }
 
         //!pausetimer - pause the timer, if it is running
-        if (message == "!pausetimer"){
+        if (message.split(' ')[0] == "!pausetimer"){
             timeScript.pauseTimer();
             if (DEBUG_MODE) console.log("Timer paused!");
             else tmi.say(channel, "Timer paused!");
@@ -200,7 +200,7 @@ tmi.on('chat', (channel, userstate, message, self) => {
         }
 
         //!followbots <number_of_bots> - use to subtract the amount of time that was added from X number of follow bots
-        if (message.split(' ')[0].toLowerCase() == "!followBots"){
+        if (message.split(' ')[0].toLowerCase() == "!followbots"){
             try{
                 let numOfFollowers = parseInt(message.split(' ')[1]);
                 if (Number.isInteger(numOfFollowers)){
@@ -230,8 +230,8 @@ tmi.on('chat', (channel, userstate, message, self) => {
                     run = setInterval(() => {
                         timeScript.updateTime();
                     }, timerSpeed);
-                    if (DEBUG_MODE) console.log(`Success! Timer will now go down 1 second every ${speed} second(s).`);
-                    else tmi.say(channel, `Success! Timer will now go down 1 second every ${speed} second(s).`)
+                    if (DEBUG_MODE) console.log(`Timer will now go down 1 second every ${speed} second(s).`);
+                    else tmi.say(channel, `Timer will now go down 1 second every ${speed} second(s).`)
                 }
                 else{
                     if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for the speed to decrease a second from the timer!");
