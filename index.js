@@ -9,7 +9,7 @@ const followersIDCSV = 'followersID.csv'; //CSV file should be downloaded just b
 const moderatorID = '909337288'; //a moderator's ID is needed to be able to subscribe to event subs
                                  //can be fetched using: https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
 
-//Configure the amount of seconds each event adds to the timer
+//Configure the amount of **SECONDS** each event adds to the timer
 const followersTime = 60; //60 seconds add to the timer when someone new follows
 const tier1SubsTime = 300; //5 mins for tier 1 subs
 const tier2SubsTime = 600; //10 mins for tier 2 subs
@@ -22,6 +22,7 @@ const minimumDonationAmountToAddTime = 0; //Only adds time to the timer when mor
 const customRewardTitle = 'Add 1 minute to timer'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
 const customRewardCost = 1000; //Cost for the custom channel point reward, in channel points
 const customRewardTime = 60; //1 minute for channel point reward redemption.
+const retweetTime = 60; //1 minute for 1 retweet
 
 const DEBUG_MODE = false;
 
@@ -243,6 +244,36 @@ tmi.on('chat', (channel, tags, message) => {
                 else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for the speed to decrease a second from the timer!");
             }
         }
+
+        //!retweets <number-of-retweets> - use to add time for new retweets that have happened on a tweet
+        if (message.split(' ')[0].toLowerCase() == "!retweets"){
+            try{
+                let newRetweetCount = parseInt(message.split(' ')[1]);
+                if (Number.isInteger(newRetweetCount)){
+                    let oldRetweetCount = fs.readFileSync('retweets.txt', 'utf8');
+                    let difference = newRetweetCount - oldRetweetCount;
+                    if (difference > 0){
+                        let seconds = retweetTime * difference;
+                        addToTimer(seconds);
+                        fs.writeFileSync('retweets.txt', newRetweetCount.toString());
+                        if (DEBUG_MODE) console.log(`Added ${seconds} seconds for ${difference} new retweets!`)
+                        else tmi.say(channel, `Added ${seconds} seconds for ${difference} new retweets!`)
+                    }
+                    else{
+                        if (DEBUG_MODE) console.log("No time added as there have been no new retweets!")
+                        else tmi.say(channel, "No time added as there have been no new retweets!")
+                    }
+                }
+                else{
+                    if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for the number of retweets!")
+                    else tmi.say(channel, "USER ERROR: Please input a valid number for the number of retweets!")
+                }
+            }
+            catch{
+                if (DEBUG_MODE) console.log("SYSTEM ERROR: Please input a valid number for the number of retweets!")
+                else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for the number of retweets!")
+            }
+        }
     }
 })
 
@@ -276,7 +307,7 @@ streamlabs.on('event', (eventData) => {
             const amount = eventData.message.amount;
             try{
                 const CC = require('currency-converter-lt');
-                let currencyConverter = new CC({from:"USD", to: "GBP", amount: 1.3});
+                let currencyConverter = new CC({from: currency, to: "GBP", amount: amount});
                 currencyConverter.convert().then((res) =>{
                     //Round converted value to 2 decimals
                     console.log(res.toFixed(2));
@@ -296,8 +327,6 @@ streamlabs.on('event', (eventData) => {
         }
     }
 })
-
-
 
 
 
