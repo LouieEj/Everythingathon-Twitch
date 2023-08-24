@@ -42,10 +42,6 @@ An Everythingathon is similar to a Subathon, but in a Subathon only subscription
 - Open `index.js` and set the constant `channelToMonitor` equal to the name of the channel for the Everythingathon (caps do not matter).
   - e.g. set `channelToMonitor = 'louieej'` if the Twitch channel for this Everythingathon is LouieEj.
 
-### Setting a moderator's ID
-- The user ID for a moderator of the channel for the subathon (which has just been set to `channelToMonitor`) needs to be provided.
-  - To do this [go to this website](https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/), type in the name of a moderator for the channel, and then copy and paste the user ID.
-
 ### Configure time for each event
 - The time which gets added to the timer, in seconds, can be configured at the top of `index.js`.
   - IMPORTANT: Make sure all values are in seconds, e.g. 10 minutes should be the value 600.
@@ -69,7 +65,7 @@ An Everythingathon is similar to a Subathon, but in a Subathon only subscription
   - If, for whatever reason, you cannot name the file this, call it something else and then update the constant `followersIDCSV` in `index.js` accordingly.
 
 ## RUNNING THE TIMER
+- When running the bot for an actual Everythingathon, and not for testing, you should set the value for `DEBUG_MODE` near the top of `index.js` to false.
 - Go to the directory of the timer and open a command prompt/terminal window.
 - Type `node index.js` and the timer should start running.
 - If you ever need to stop the timer, you can press Control + C in the terminal window.
-- When running the bot for an actual Everythingathon, and not for testing, you should set the value for `DEBUG_MODE` near the top of `index.js` to false.

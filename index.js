@@ -6,41 +6,57 @@
 const channelToMonitor = 'louieej';
 const followersIDCSV = 'followersID.csv'; //CSV file should be downloaded just before start of Everythingathon
                                         //can be downloaded from: https://twitch-tools.rootonline.de/followerlist_viewer.php
-const moderatorID = '909337288'; //a moderator's ID is needed to be able to subscribe to event subs
-                                 //can be fetched using: https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
+const blockedRaidersCSV = 'blockedRaiders.csv'; //CSV file containing list of names of Twitch users who will not add time to the timer through the use of raids
 
 //Configure the amount of **SECONDS** each event adds to the timer
+//FOLLOWERS
 const followersTime = 60; //60 seconds add to the timer when someone new follows
+//SUBS
 const tier1SubsTime = 300; //5 mins for tier 1 subs
 const tier2SubsTime = 600; //10 mins for tier 2 subs
 const tier3SubsTime = 900; //15 mins for tier 3 subs
+//BITS
 const cheer100Time = 60; //1 minute for 100 bits - scales with number of bits, e.g. 500 bits will be 5 mins, 1000 bits will be 10 mins, etc
+//RAIDS
 const secondsPerViewerFromRaid = 1; //1 second gets added to the timer per viewer that was part of a raid, e.g. raid with 100 viewers will add 100 secs
+const minViewersForRaidToAddTime = 2; //Will only add time if the number of viewers from the raid is greater than or equal to this amount (default: 2)
+//STREAMLABS DONOS
 const donation1PoundTime = 60; //1 minute for £1 donated - scales with amount donated, e.g. £5 donated will be 5 mins, £10 will be 10 mins, etc
 const minimumDonationAmountToAddTime = 0; //Only adds time to the timer when more than this amount has been added...
                                           //..by default, there is no minimum, so even if a user donates £0.01, 1 second will be added
-const customRewardTitle = 'Add 1 minute to timer'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
-const customRewardCost = 1000; //Cost for the custom channel point reward, in channel points
+//CHANNEL POINT REWARD
+const customRewardTitle = 'For song request, use !ssr command'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
+const customRewardCost = 1; //Cost for the custom channel point reward, in channel points
 const customRewardTime = 60; //1 minute for channel point reward redemption.
+//RETWEET
 const retweetTime = 60; //1 minute for 1 retweet
 
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 
 //------------------------- CODE -------------------------//
+const fs = require('fs');
 require("dotenv/config");
 
 // ----- GLOBAL VARIABLES DO NOT EDIT ----- //
 var timerSpeed = 1000;
+var happyHourMultiplier = 1.0;
+var reverseTimer = false;
 
 //Add time function
 const timeScript = require('./timeScript');
 function addToTimer(time){
-    timeScript.addTime(time + 1); //1 second added to any time so actual time gets added (as 1 second will pass before gets triggered)
+    console.log(`Adding ${time * happyHourMultiplier} seconds to the timer...`)
+    timeScript.addTime((time * happyHourMultiplier) + 1); //1 second added to any time so actual time gets added (as 1 second will pass before gets triggered)
 }
 
 //Update time loop (every X seconds, determined by timerSpeed [default = 1000ms/1 second])
 let run = setInterval(() => {
-    timeScript.updateTime();
+    if (reverseTimer){
+        timeScript.updateTimeReverse();
+    }
+    else{
+        timeScript.updateTime();
+    }
 }, timerSpeed);
 
 
@@ -59,6 +75,12 @@ const tmi = new tmiLib.Client({
 
 // ----- COMMANDS ----- //
 tmi.on('chat', (channel, tags, message) => {
+
+    //Check if user is a standard user
+    if (tags.badges == undefined){
+        return;
+    }
+
     if (tags.badges.broadcaster || tags.badges.moderator){
         //Check that bot is awake, or get help
         if (message.split(' ')[0] == "!everythingathon"){
@@ -274,17 +296,43 @@ tmi.on('chat', (channel, tags, message) => {
                 else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for the number of retweets!")
             }
         }
+
+        //!happyhour <multiplier> - use to multiply the amount that all events add to the timer by a given multiplier, e.g. !happyhour 2 will double all events time
+        if (message.split(' ')[0].toLowerCase() == "!happyhour"){
+            try{
+                let multiplier = parseFloat(message.split(' ')[1]);
+                if (multiplier > 0){
+                    happyHourMultiplier = multiplier;
+                    if (DEBUG_MODE) console.log(`Started the happy hour! Time added by all events it now multiplied by ${happyHourMultiplier}!`)
+                    else tmi.say(channel, `Started the happy hour! Time added by all events it now multiplied by ${happyHourMultiplier}!`)
+                }
+                else{
+                    if (DEBUG_MODE) console.log("USER ERROR: Please input a positive number for the happy hour multiplier!")
+                    else tmi.say(channel, "USER ERROR: Please input a positive number for the happy hour multiplier!")
+                }
+            }
+            catch{
+                if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for the happy hour multiplier!")
+                else tmi.say(channel, "USER ERROR: Please input a valid number for the happy hour multiplier!")
+            }
+        }
+
+        //!togglereverse - use to toggle whether the timer is going forward (default) or reverse
+        if (message.split(' ')[0].toLowerCase() == "!togglereverse"){
+            reverseTimer = !reverseTimer;
+            if (reverseTimer){
+                if (DEBUG_MODE) console.log("The timer will now go backwards!")
+                else tmi.say(channel, "The timer will now go backwards!")
+            }
+            else{
+                if (DEBUG_MODE) console.log("The timer will now go forwards!")
+                else tmi.say(channel, "The timer will now go forwards!")
+            }
+            fs.writeFileSync('reverse.txt', reverseTimer.toString());
+        }
     }
 })
 
-// ---- COMMENTED OUT AS TWITCH API CAN HANDLE RAIDS ---- //
-// // ----- Raids ----- //
-// //uses tmi library to read when a raid occurs
-// tmi.on("raided", (channel, username, viewers) => {
-//     console.log(channel, `raid detected by ${username} with ${viewers} viewers!`);
-//     //Increase timer by X amount
-//     addToTimer(viewers * secondsPerViewerFromRaid);
-// })
 
 //Connect TMI client to the channel specified
 tmi.connect();
@@ -376,17 +424,16 @@ function startListener(){
     listener.onChannelFollow(userID, userID, e =>{
         console.log(`TWURPLE: ${e.userDisplayName} (${e.userId}) just followed!`);
         readFollowersID(e.userId, e.userDisplayName);
-        addToTimer(followersTime);
     })
 
     // ---- CHEER/BITS EVENT ---- //
-    listener.onChannelCheer(userID, moderatorID, e => {
+    listener.onChannelCheer(userID, e => {
         console.log(`TWURPLE: ${e.bits} were cheered by ${e.userDisplayName}`);
         addToTimer(Math.round(cheer100Time * (e.bits / 100)))
     })
     
     // ---- SUB EVENT ---- //
-    listener.onChannelSubscription(userID, moderatorID, e =>{
+    listener.onChannelSubscription(userID, e =>{
         console.log(`TWURPLE: ${e.userDisplayName} (${e.userId}) just subscribed with tier: ${e.tier}`);
         if (e.tier == 1000){ //tier 1 = 1000
             addToTimer(tier1SubsTime);
@@ -400,9 +447,32 @@ function startListener(){
     })
     
     // ---- RAID EVENT ---- //
-    listener.onChannelRaidFrom(userID, moderatorID, e =>{
-        console.log(`TWURPLE: ${e.userDisplayName} (${e.userId}) just raided with ${e.viewers} viewers!`);
-        addToTimer(secondsPerViewerFromRaid * e.viewers);
+    listener.onChannelRaidTo(userID, e =>{
+        let found = false;
+        console.log(`TWURPLE: ${e.raidingBroadcasterDisplayName} (${e.raidingBroadcasterId}) just raided with ${e.viewers} viewers!`);
+        fs.createReadStream(blockedRaidersCSV)
+        .pipe(csv())
+        .on('data', (row) => {
+          if (row.BLOCKED.toLowerCase() == e.raidingBroadcasterDisplayName.toLowerCase()){
+            //raider is blocked from adding time to the timer for their raids
+            found = true;
+          }
+        })
+        .on('end', () =>{
+            if (found){
+                console.log(`No time added for the raid from ${e.raidingBroadcasterDisplayName} as they are in blockedRaiders.csv`)
+            }
+            else{
+                if (e.viewers >= minViewersForRaidToAddTime){
+                    let time = 0;
+                    addToTimer(secondsPerViewerFromRaid * time);
+                }
+                else{
+                    if (DEBUG_MODE) console.log(`No time added for the raid from ${e.raidingBroadcasterDisplayName} as not enough viewers were part of the raid!`)
+                    else tmi.say(channel, `No time added for the raid from ${e.raidingBroadcasterDisplayName} as not enough viewers were part of the raid!`)
+                }
+            }
+        })
     })
 
     
@@ -426,8 +496,8 @@ function startListener(){
 //Read the ID of all followers from CSV file, to check if the user has already followed before (prevent follow exploit)
 var found = false;
 const csv = require('csv-parser');
-const fs = require('fs');
 const { debug } = require("console");
+const { reverse } = require("dns");
 async function readFollowersID(followerID, followerUsername){
     console.log(`   Attempting to read followers ID from ${followersIDCSV}...`)
     try{
@@ -452,7 +522,7 @@ async function readFollowersID(followerID, followerUsername){
                         if (err) throw err;
                         console.log(`           Successfully added ${followerUsername}'s ID (${followerID}) to ${followersIDCSV}`);
                         //Add time to timer
-                        addToTimer(60);
+                        addToTimer(followersTime);
                     })
                 }
                 catch (e){

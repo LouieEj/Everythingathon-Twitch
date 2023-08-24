@@ -40,131 +40,136 @@
         var running = true;
         let hitZero = false;
         let previous = 0;
+        let reverseTimer = false;
         setInterval(() => {
             if (running){
                 fetch("time.txt").then(response => response.text()).then(async function(result) {
-                    console.log(result);
-                    const dayText = document.getElementById("dayText");
-                    const hourText = document.getElementById("hourText");
-                    const minuteText = document.getElementById("minuteText");
-                    const secondText = document.getElementById("secondText");
+                    fetch("reverse.txt").then(res => res.text()).then(async function (r){
+                        console.log(r)
+                        if (r.toString() == "true") reverseTimer = true;
+                        else reverseTimer = false;
+                        const dayText = document.getElementById("dayText");
+                        const hourText = document.getElementById("hourText");
+                        const minuteText = document.getElementById("minuteText");
+                        const secondText = document.getElementById("secondText");
 
-                    const dayDiv = document.getElementById("days");
-                    const hourDiv = document.getElementById("hours");
-                    const minuteDiv = document.getElementById("minutes");
-                    const dayColon = document.getElementById("dayColon");
-                    const hourColon = document.getElementById("hourColon");
-                    const minuteColon = document.getElementById("minuteColon"); 
+                        const dayDiv = document.getElementById("days");
+                        const hourDiv = document.getElementById("hours");
+                        const minuteDiv = document.getElementById("minutes");
+                        const dayColon = document.getElementById("dayColon");
+                        const hourColon = document.getElementById("hourColon");
+                        const minuteColon = document.getElementById("minuteColon"); 
 
-                    const container = document.getElementById("textDiv");
+                        const container = document.getElementById("textDiv");
 
-                    let secondsInt = parseInt(result);
-                    if (secondsInt <= 0 || hitZero){
-                        secondText.style.color = "red";
-                        secondText.innerHTML = "00";
-                        dayText.style.display = "none";
-                        dayDiv.style.display = "none";
-                        dayColon.style.display = "none";
-                        hourText.style.display = "none";
-                        hourDiv.style.display = "none";
-                        hourColon.style.display = "none";
-                        minuteText.style.display = "none";
-                        minuteDiv.style.display = "none";
-                        minuteColon.style.display = "none";
-                        hitZero = true;
-                    }
-                    else{
-                        let days = Math.floor(secondsInt / (3600 * 24));
-                        let hours = Math.floor(secondsInt % (3600 * 24) / 3600);
-                        let minutes = Math.floor(secondsInt % 3600 / 60);
-                        let seconds = Math.floor(secondsInt % 60);
-
-                        let textDays = days.toString();
-                        let textHours = hours.toString();
-                        let textMinutes = minutes.toString();
-                        let textSeconds = seconds.toString();
-                        if (days < 10){
-                            textDays = "0" + days;
-                        }
-                        if (hours < 10){
-                            textHours = "0" + hours;
-                        }
-                        if (minutes < 10){
-                            textMinutes = "0" + minutes;
-                        }
-                        if (seconds < 10){
-                            textSeconds = "0" + seconds;
-                        }
-                        let showDays = true;
-                        let showHours = true;
-                        let showMinutes = true;
-
-                        if (days <= 0){
-                            showDays = false;
-                            if (hours <= 0){
-                                showHours = false;
-                                if (minutes <= 0){
-                                    showMinutes = false;
-                                }
-                            }
-                        }
-                        dayText.innerHTML = textDays;
-                        hourText.innerHTML = textHours;
-                        minuteText.innerHTML = textMinutes;
-                        secondText.innerHTML = textSeconds;
-
-                        dayText.style.display = "block";
-                        dayDiv.style.display = "block";
-                        dayColon.style.display = "block";
-                        hourText.style.display = "block";
-                        hourDiv.style.display = "block";
-                        hourColon.style.display = "block";
-                        minuteText.style.display = "block";
-                        minuteDiv.style.display = "block";
-                        minuteColon.style.display = "block";
-                        secondText.style.color = "initial";
-
-                        if (!showDays){
+                        let secondsInt = parseInt(result);
+                        if (secondsInt <= 0 || hitZero){
+                            secondText.style.color = "red";
+                            secondText.innerHTML = "00";
                             dayText.style.display = "none";
                             dayDiv.style.display = "none";
                             dayColon.style.display = "none";
-                            container.style.width = "450px";
-                        }
-                        if (!showHours){
                             hourText.style.display = "none";
                             hourDiv.style.display = "none";
                             hourColon.style.display = "none";
-                            container.style.width = "300px";
-                        }
-                        if (!showMinutes){
                             minuteText.style.display = "none";
                             minuteDiv.style.display = "none";
                             minuteColon.style.display = "none";
+                            hitZero = true;
                         }
-                        if (secondsInt <= 10){
-                            secondText.style.color = "red";
-                            await new Promise(r => setTimeout(r, 500));
-                            secondText.style.color = "initial";
-                        }
+                        else{
+                            let days = Math.floor(secondsInt / (3600 * 24));
+                            let hours = Math.floor(secondsInt % (3600 * 24) / 3600);
+                            let minutes = Math.floor(secondsInt % 3600 / 60);
+                            let seconds = Math.floor(secondsInt % 60);
 
-                        let difference = secondsInt - previous;
-                        previous = secondsInt;
-                        if (difference > 0){
-                            let addedTime = document.createElement("p");
-                            addedTime.classList = "addedTime";
-                            addedTime.innerText = `+${difference}s`;
-                            document.body.appendChild(addedTime);
-                            addedTime.style.display = "block";
-                            await new Promise(resolve => setTimeout(resolve, 50));
-                            addedTime.style.left = `${Math.floor(Math.random() * (25 - 2) + 2)}%`;
-                            addedTime.style.top = `${Math.floor(Math.random() * (10 - 0) + 0)}%`;
-                            addedTime.style.opacity = "1";
-                            await new Promise(resolve => setTimeout(resolve, 2500));
-                            addedTime.style.opacity = "0";
-                            await new Promise(resolve => setTimeout(resolve, 500));
-                            addedTime.remove();
+                            let textDays = days.toString();
+                            let textHours = hours.toString();
+                            let textMinutes = minutes.toString();
+                            let textSeconds = seconds.toString();
+                            if (days < 10){
+                                textDays = "0" + days;
+                            }
+                            if (hours < 10){
+                                textHours = "0" + hours;
+                            }
+                            if (minutes < 10){
+                                textMinutes = "0" + minutes;
+                            }
+                            if (seconds < 10){
+                                textSeconds = "0" + seconds;
+                            }
+                            let showDays = true;
+                            let showHours = true;
+                            let showMinutes = true;
+
+                            if (days <= 0){
+                                showDays = false;
+                                if (hours <= 0){
+                                    showHours = false;
+                                    if (minutes <= 0){
+                                        showMinutes = false;
+                                    }
+                                }
+                            }
+                            dayText.innerHTML = textDays;
+                            hourText.innerHTML = textHours;
+                            minuteText.innerHTML = textMinutes;
+                            secondText.innerHTML = textSeconds;
+
+                            dayText.style.display = "block";
+                            dayDiv.style.display = "block";
+                            dayColon.style.display = "block";
+                            hourText.style.display = "block";
+                            hourDiv.style.display = "block";
+                            hourColon.style.display = "block";
+                            minuteText.style.display = "block";
+                            minuteDiv.style.display = "block";
+                            minuteColon.style.display = "block";
+                            secondText.style.color = "initial";
+
+                            if (!showDays){
+                                dayText.style.display = "none";
+                                dayDiv.style.display = "none";
+                                dayColon.style.display = "none";
+                                container.style.width = "450px";
+                            }
+                            if (!showHours){
+                                hourText.style.display = "none";
+                                hourDiv.style.display = "none";
+                                hourColon.style.display = "none";
+                                container.style.width = "300px";
+                            }
+                            if (!showMinutes){
+                                minuteText.style.display = "none";
+                                minuteDiv.style.display = "none";
+                                minuteColon.style.display = "none";
+                            }
+                            if (secondsInt <= 10){
+                                secondText.style.color = "red";
+                                await new Promise(r => setTimeout(r, 500));
+                                secondText.style.color = "initial";
+                            }
+
+                            let difference = secondsInt - previous;
+                            previous = secondsInt;
+                            if (difference > 0 && reverseTimer == false){
+                                let addedTime = document.createElement("p");
+                                addedTime.classList = "addedTime";
+                                addedTime.innerText = `+${difference}s`;
+                                document.body.appendChild(addedTime);
+                                addedTime.style.display = "block";
+                                await new Promise(resolve => setTimeout(resolve, 50));
+                                addedTime.style.left = `${Math.floor(Math.random() * (25 - 2) + 2)}%`;
+                                addedTime.style.top = `${Math.floor(Math.random() * (10 - 0) + 0)}%`;
+                                addedTime.style.opacity = "1";
+                                await new Promise(resolve => setTimeout(resolve, 2500));
+                                addedTime.style.opacity = "0";
+                                await new Promise(resolve => setTimeout(resolve, 500));
+                                addedTime.remove();
+                            }
                         }
-                    }
+                    });
                 });
             }
             

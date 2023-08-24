@@ -35,6 +35,19 @@ module.exports = {
         }
     },
 
+    updateTimeReverse: function(){
+        if (running){
+            try{
+                let data = fs.readFileSync('time.txt', 'utf8');
+                updatedTime = parseInt(data) + 1;
+                fs.writeFileSync('time.txt', updatedTime.toString());
+            }
+            catch(e){
+                console.log('Error when updating timer: ' + e);
+            }
+        }
+    },
+
     setTimer: function(time){
         try{
             fs.writeFileSync('time.txt', time.toString());
