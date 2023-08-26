@@ -25,8 +25,8 @@ const donation1PoundTime = 60; //1 minute for £1 donated - scales with amount d
 const minimumDonationAmountToAddTime = 0; //Only adds time to the timer when more than this amount has been added...
                                           //..by default, there is no minimum, so even if a user donates £0.01, 1 second will be added
 //CHANNEL POINT REWARD
-const customRewardTitle = 'For song request, use !ssr command'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
-const customRewardCost = 1; //Cost for the custom channel point reward, in channel points
+const customRewardTitle = 'Add 1 minute to the timer'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
+const customRewardCost = 1000; //Cost for the custom channel point reward, in channel points
 const customRewardTime = 60; //1 minute for channel point reward redemption.
 //RETWEET
 const retweetTime = 60; //1 minute for 1 retweet
