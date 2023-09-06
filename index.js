@@ -25,11 +25,13 @@ const donation1PoundTime = 60; //1 minute for £1 donated - scales with amount d
 const minimumDonationAmountToAddTime = 0; //Only adds time to the timer when more than this amount has been added...
                                           //..by default, there is no minimum, so even if a user donates £0.01, 1 second will be added
 //CHANNEL POINT REWARD
-const customRewardTitle = 'Add 1 minute to the timer'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
+const customRewardTitle = 'Add 10 minutes to the timer'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
 const customRewardCost = 1000; //Cost for the custom channel point reward, in channel points
 const customRewardTime = 60; //1 minute for channel point reward redemption.
 //RETWEET
 const retweetTime = 60; //1 minute for 1 retweet
+//REBLOG (tumblr)
+const reblogTime = 60; //1 minute for 1 reblog
 
 const DEBUG_MODE = true;
 
@@ -297,6 +299,36 @@ tmi.on('chat', (channel, tags, message) => {
             }
         }
 
+        //!reblogs <number-of-reblogs> - use to add time for new reblogs that have happened on a tumblr post [idk how tumblr works but i think they are called posts????]
+        if (message.split(' ')[0].toLowerCase() == "!reblogs"){
+            try{
+                let newReblogCount = parseInt(message.split(' ')[1]);
+                if (Number.isInteger(newReblogCount)){
+                    let oldReblogCount = fs.readFileSync('reblogs.txt', 'utf8');
+                    let difference = newReblogCount - oldReblogCount;
+                    if (difference > 0){
+                        let seconds = reblogTime * difference;
+                        addToTimer(seconds);
+                        fs.writeFileSync('reblogs.txt', newReblogCount.toString());
+                        if (DEBUG_MODE) console.log(`Added ${seconds} seconds for ${difference} new reblogs!`)
+                        else tmi.say(channel, `Added ${seconds} seconds for ${difference} new reblogs!`)
+                    }
+                    else{
+                        if (DEBUG_MODE) console.log("No time added as there have been no new reblogs!")
+                        else tmi.say(channel, "No time added as there have been no new reblogs!")
+                    }
+                }
+                else{
+                    if (DEBUG_MODE) console.log("USER ERROR: Please input a valid number for the number of reblogs!")
+                    else tmi.say(channel, "USER ERROR: Please input a valid number for the number of reblogs!")
+                }
+            }
+            catch{
+                if (DEBUG_MODE) console.log("SYSTEM ERROR: Please input a valid number for the number of reblogs!")
+                else tmi.say(channel, "SYSTEM ERROR: Please input a valid number for the number of reblogs!")
+            }
+        }
+
         //!happyhour <multiplier> - use to multiply the amount that all events add to the timer by a given multiplier, e.g. !happyhour 2 will double all events time
         if (message.split(' ')[0].toLowerCase() == "!happyhour"){
             try{
@@ -329,6 +361,27 @@ tmi.on('chat', (channel, tags, message) => {
                 else tmi.say(channel, "The timer will now go forwards!")
             }
             fs.writeFileSync('reverse.txt', reverseTimer.toString());
+        }
+
+        //!banraids <username> - use to prevent raids from a specific user by adding <username> to blockRaiders.csv
+        if (message.split(' ')[0].toLowerCase() == "!banraids"){
+            try{
+                let username = message.split(' ')[1];
+                try{
+                    //Write the username to blocked raiders csv file
+                    fs.appendFile(blockedRaidersCSV, username + '\r\n', (err) =>{
+                        if (err) throw err;
+                        tmi.say(channel, `Successfully added ${username} to ${blockedRaidersCSV}`);
+                    })
+                }
+                catch (e){
+                    tmi.say(channel, `An error occured when writing to ${blockedRaidersCSV}: ` + e);
+                }
+            }
+            catch{
+                if (DEBUG_MODE) console.log("ERROR: Please input a valid username!")
+                else tmi.say(channel, "ERROR: Please input a valid username!")
+            }
         }
     }
 })

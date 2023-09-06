@@ -69,3 +69,5 @@ An Everythingathon is similar to a Subathon, but in a Subathon only subscription
 - Go to the directory of the timer and open a command prompt/terminal window.
 - Type `node index.js` and the timer should start running.
 - If you ever need to stop the timer, you can press Control + C in the terminal window.
+
+### ALL COMMANDS CAN BE FOUND IN BotCommands.txt

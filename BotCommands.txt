@@ -18,6 +18,10 @@
 
 !retweets <number-of-retweets> - use to add time for new retweets that have happened on a tweet
 
+!reblogs <number-of-reblogs> - use to add time for new reblogs that have happened on a tumblr post
+
 !happyhour <multiplier> - use to multiply the amount that all events add to the timer by a given multiplier, e.g. !happyhour 2 will double all events time
 
 !togglereverse - use to toggle whether the timer is going forward (default) or reverse
+
+!banraids <username> - use to prevent raids from a specific user by adding <username> to blockRaiders.csv
