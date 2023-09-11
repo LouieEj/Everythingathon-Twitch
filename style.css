@@ -74,6 +74,6 @@ canvas {
     font-weight: 400;
     font-size: 3.25rem;
     color: var(--background-color);
-    text-shadow: 0 0 1.5rem var(--text-color);
+    text-shadow: 0px 0px 10px #000000, 8px 8px 12px #000000;
     transition: top 1s ease-out, opacity .5s ease-out;
 }

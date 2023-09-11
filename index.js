@@ -3,7 +3,7 @@
 
 //------------------------- GLOBAL VARIABLES TO EDIT -------------------------//
 //scopes: moderator:read:followers bits:read channel:read:subscriptions channel:read:redemptions channel:manage:redemptions
-const channelToMonitor = 'louieej';
+const channelToMonitor = 'fulham';
 const followersIDCSV = 'followersID.csv'; //CSV file should be downloaded just before start of Everythingathon
                                         //can be downloaded from: https://twitch-tools.rootonline.de/followerlist_viewer.php
 const blockedRaidersCSV = 'blockedRaiders.csv'; //CSV file containing list of names of Twitch users who will not add time to the timer through the use of raids
@@ -351,14 +351,15 @@ tmi.on('chat', (channel, tags, message) => {
 
         //!togglereverse - use to toggle whether the timer is going forward (default) or reverse
         if (message.split(' ')[0].toLowerCase() == "!togglereverse"){
-            reverseTimer = !reverseTimer;
             if (reverseTimer){
-                if (DEBUG_MODE) console.log("The timer will now go backwards!")
-                else tmi.say(channel, "The timer will now go backwards!")
-            }
-            else{
+                reverseTimer = false;
                 if (DEBUG_MODE) console.log("The timer will now go forwards!")
                 else tmi.say(channel, "The timer will now go forwards!")
+            }
+            else{
+                reverseTimer = true;
+                if (DEBUG_MODE) console.log("The timer will now go backwards!")
+                else tmi.say(channel, "The timer will now go backwards!")
             }
             fs.writeFileSync('reverse.txt', reverseTimer.toString());
         }
@@ -400,28 +401,15 @@ const streamlabs = io(`https://sockets.streamlabs.com?token=${process.env.SOCKET
 
 streamlabs.on('event', (eventData) => {
     //subscribe to StreamLabs Socket API endpoint for donations
-    if (!eventData.for && eventData.type == 'donation'){
+    if (eventData.type == 'donation'){
         try{
-            let result = JSON.parse(eventData.message);
-            console.log(result);
-            const currency = eventData.message.currency;
-            const amount = eventData.message.amount;
-            try{
-                const CC = require('currency-converter-lt');
-                let currencyConverter = new CC({from: currency, to: "GBP", amount: amount});
-                currencyConverter.convert().then((res) =>{
-                    //Round converted value to 2 decimals
-                    console.log(res.toFixed(2));
-                    if (res > minimumDonationAmountToAddTime){
-                        let seconds = donation1PoundTime * res.toFixed(2);
-                        addToTimer(seconds);
-                    }
-                })
+            console.log(eventData);
+            const amount = eventData.message[0].amount;
+            console.log(amount);
+            if (amount > minimumDonationAmountToAddTime){
+                let seconds = donation1PoundTime * amount.toFixed(2);
+                addToTimer(seconds);
             }
-            catch{
-                console.log("Error reading/converting currency from StreamLabs donation!");
-            }
-
         }
         catch{
             console.log("Error getting donation amount!");
@@ -471,6 +459,7 @@ const apiClient = new twurpleApi.ApiClient({authProvider});
 const twurpleEventSub = require('@twurple/eventsub-ws');
 const listener = new twurpleEventSub.EventSubWsListener({apiClient});
 
+
 //All listener functions are emplaced in a separate function, which is only called after the user ID of channelToMonitor has been fetched
 function startListener(){
     // ---- FOLLOW EVENT ---- //
@@ -484,6 +473,7 @@ function startListener(){
         console.log(`TWURPLE: ${e.bits} were cheered by ${e.userDisplayName}`);
         addToTimer(Math.round(cheer100Time * (e.bits / 100)))
     })
+
     
     // ---- SUB EVENT ---- //
     listener.onChannelSubscription(userID, e =>{
@@ -517,7 +507,7 @@ function startListener(){
             }
             else{
                 if (e.viewers >= minViewersForRaidToAddTime){
-                    let time = 0;
+                    let time = e.viewers;
                     addToTimer(secondsPerViewerFromRaid * time);
                 }
                 else{
