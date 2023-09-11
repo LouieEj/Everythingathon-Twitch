@@ -3,37 +3,37 @@
 
 //------------------------- GLOBAL VARIABLES TO EDIT -------------------------//
 //scopes: moderator:read:followers bits:read channel:read:subscriptions channel:read:redemptions channel:manage:redemptions
-const channelToMonitor = 'fulham';
+const channelToMonitor = 'Fulham';
 const followersIDCSV = 'followersID.csv'; //CSV file should be downloaded just before start of Everythingathon
                                         //can be downloaded from: https://twitch-tools.rootonline.de/followerlist_viewer.php
 const blockedRaidersCSV = 'blockedRaiders.csv'; //CSV file containing list of names of Twitch users who will not add time to the timer through the use of raids
 
 //Configure the amount of **SECONDS** each event adds to the timer
 //FOLLOWERS
-const followersTime = 60; //60 seconds add to the timer when someone new follows
+const followersTime = 30; //30 seconds add to the timer when someone new follows
 //SUBS
-const tier1SubsTime = 300; //5 mins for tier 1 subs
-const tier2SubsTime = 600; //10 mins for tier 2 subs
-const tier3SubsTime = 900; //15 mins for tier 3 subs
+const tier1SubsTime = 420; //7 mins for tier 1 subs
+const tier2SubsTime = 900; //10 mins for tier 2 subs
+const tier3SubsTime = 2700; //15 mins for tier 3 subs
 //BITS
-const cheer100Time = 60; //1 minute for 100 bits - scales with number of bits, e.g. 500 bits will be 5 mins, 1000 bits will be 10 mins, etc
+const cheer100Time = 150; //1 minute for 100 bits - scales with number of bits, e.g. 500 bits will be 5 mins, 1000 bits will be 10 mins, etc
 //RAIDS
-const secondsPerViewerFromRaid = 1; //1 second gets added to the timer per viewer that was part of a raid, e.g. raid with 100 viewers will add 100 secs
+const secondsPerViewerFromRaid = 5; //1 second gets added to the timer per viewer that was part of a raid, e.g. raid with 100 viewers will add 100 secs
 const minViewersForRaidToAddTime = 2; //Will only add time if the number of viewers from the raid is greater than or equal to this amount (default: 2)
 //STREAMLABS DONOS
-const donation1PoundTime = 60; //1 minute for £1 donated - scales with amount donated, e.g. £5 donated will be 5 mins, £10 will be 10 mins, etc
-const minimumDonationAmountToAddTime = 0; //Only adds time to the timer when more than this amount has been added...
+const donation1PoundTime = 150; //1 minute for 1USD donated - scales with amount donated, e.g. £5 donated will be 5 mins, £10 will be 10 mins, etc
+const minimumDonationAmountToAddTime = 1; //Only adds time to the timer when more than this amount has been added...
                                           //..by default, there is no minimum, so even if a user donates £0.01, 1 second will be added
 //CHANNEL POINT REWARD
-const customRewardTitle = 'Add 10 minutes to the timer'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
+const customRewardTitle = 'Add 1m to the timer!'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
 const customRewardCost = 1000; //Cost for the custom channel point reward, in channel points
 const customRewardTime = 60; //1 minute for channel point reward redemption.
 //RETWEET
-const retweetTime = 60; //1 minute for 1 retweet
+const retweetTime = 10; //1 minute for 1 retweet
 //REBLOG (tumblr)
-const reblogTime = 60; //1 minute for 1 reblog
+const reblogTime = 2; //1 minute for 1 reblog
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = true; //set to false in real thing :3
 
 //------------------------- CODE -------------------------//
 const fs = require('fs');
@@ -351,15 +351,17 @@ tmi.on('chat', (channel, tags, message) => {
 
         //!togglereverse - use to toggle whether the timer is going forward (default) or reverse
         if (message.split(' ')[0].toLowerCase() == "!togglereverse"){
+            //reverseTimer = !reverseTimer;
             if (reverseTimer){
-                reverseTimer = false;
+                reverseTimer=false;
                 if (DEBUG_MODE) console.log("The timer will now go forwards!")
-                else tmi.say(channel, "The timer will now go forwards!")
+                else tmi.say(channel, "The timer will now go forwards!")                
             }
             else{
-                reverseTimer = true;
+                reverseTimer=true;
                 if (DEBUG_MODE) console.log("The timer will now go backwards!")
                 else tmi.say(channel, "The timer will now go backwards!")
+
             }
             fs.writeFileSync('reverse.txt', reverseTimer.toString());
         }
@@ -403,9 +405,9 @@ streamlabs.on('event', (eventData) => {
     //subscribe to StreamLabs Socket API endpoint for donations
     if (eventData.type == 'donation'){
         try{
-            console.log(eventData);
+            //console.log(eventData);
             const amount = eventData.message[0].amount;
-            console.log(amount);
+            //console.log(amount);
             if (amount > minimumDonationAmountToAddTime){
                 let seconds = donation1PoundTime * amount.toFixed(2);
                 addToTimer(seconds);
@@ -459,7 +461,6 @@ const apiClient = new twurpleApi.ApiClient({authProvider});
 const twurpleEventSub = require('@twurple/eventsub-ws');
 const listener = new twurpleEventSub.EventSubWsListener({apiClient});
 
-
 //All listener functions are emplaced in a separate function, which is only called after the user ID of channelToMonitor has been fetched
 function startListener(){
     // ---- FOLLOW EVENT ---- //
@@ -473,7 +474,6 @@ function startListener(){
         console.log(`TWURPLE: ${e.bits} were cheered by ${e.userDisplayName}`);
         addToTimer(Math.round(cheer100Time * (e.bits / 100)))
     })
-
     
     // ---- SUB EVENT ---- //
     listener.onChannelSubscription(userID, e =>{
@@ -507,8 +507,8 @@ function startListener(){
             }
             else{
                 if (e.viewers >= minViewersForRaidToAddTime){
-                    let time = e.viewers;
-                    addToTimer(secondsPerViewerFromRaid * time);
+                    //let time = 0;
+                    addToTimer(secondsPerViewerFromRaid * e.viewers);
                 }
                 else{
                     if (DEBUG_MODE) console.log(`No time added for the raid from ${e.raidingBroadcasterDisplayName} as not enough viewers were part of the raid!`)
