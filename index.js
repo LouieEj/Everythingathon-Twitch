@@ -3,37 +3,38 @@
 
 //------------------------- GLOBAL VARIABLES TO EDIT -------------------------//
 //scopes: moderator:read:followers bits:read channel:read:subscriptions channel:read:redemptions channel:manage:redemptions
-const channelToMonitor = 'Fulham';
+const channelToMonitor = 'CHANNEL_NAME';
 const followersIDCSV = 'followersID.csv'; //CSV file should be downloaded just before start of Everythingathon
-                                        //can be downloaded from: https://twitch-tools.rootonline.de/followerlist_viewer.php
+                                          //can be downloaded from: https://twitch-tools.rootonline.de/followerlist_viewer.php
 const blockedRaidersCSV = 'blockedRaiders.csv'; //CSV file containing list of names of Twitch users who will not add time to the timer through the use of raids
 
 //Configure the amount of **SECONDS** each event adds to the timer
 //FOLLOWERS
-const followersTime = 30; //30 seconds add to the timer when someone new follows
+const followersTime = 30; //default: 30 seconds add to the timer when someone new follows
 //SUBS
-const tier1SubsTime = 420; //7 mins for tier 1 subs
-const tier2SubsTime = 900; //10 mins for tier 2 subs
-const tier3SubsTime = 2700; //15 mins for tier 3 subs
+const tier1SubsTime = 420; //default: 7 mins for tier 1 subs
+const tier2SubsTime = 900; //default: 15 mins for tier 2 subs
+const tier3SubsTime = 1800; //default: 30 mins for tier 3 subs
 //BITS
-const cheer100Time = 150; //1 minute for 100 bits - scales with number of bits, e.g. 500 bits will be 5 mins, 1000 bits will be 10 mins, etc
+const cheer100Time = 60; //default: 1 minute for 100 bits - scales with number of bits, e.g. 500 bits will be 5 mins, 1000 bits will be 10 mins, etc
 //RAIDS
-const secondsPerViewerFromRaid = 5; //1 second gets added to the timer per viewer that was part of a raid, e.g. raid with 100 viewers will add 100 secs
+const secondsPerViewerFromRaid = 1; //default: 1 second gets added to the timer per viewer that was part of a raid, e.g. raid with 100 viewers will add 100 secs
 const minViewersForRaidToAddTime = 2; //Will only add time if the number of viewers from the raid is greater than or equal to this amount (default: 2)
 //STREAMLABS DONOS
-const donation1PoundTime = 150; //1 minute for 1USD donated - scales with amount donated, e.g. £5 donated will be 5 mins, £10 will be 10 mins, etc
+const donation1PoundTime = 60; //default: 1 minute for 1USD donated - scales with amount donated, e.g. £5 donated will be 5 mins, £10 will be 10 mins, etc
 const minimumDonationAmountToAddTime = 1; //Only adds time to the timer when more than this amount has been added...
                                           //..by default, there is no minimum, so even if a user donates £0.01, 1 second will be added
 //CHANNEL POINT REWARD
 const customRewardTitle = 'Add 1m to the timer!'; //Name for a custom channel point reward which can be redeemed to add time (CASE SENSITIVE)
-const customRewardCost = 1000; //Cost for the custom channel point reward, in channel points
-const customRewardTime = 60; //1 minute for channel point reward redemption.
+const customRewardCost = 1000; //Cost for the custom channel point reward, in channel points (default: 1000)
+const customRewardTime = 60; //default: 1 minute for channel point reward redemption.
 //RETWEET
-const retweetTime = 10; //1 minute for 1 retweet
+const retweetTime = 60; //default: 1 minute for 1 retweet
 //REBLOG (tumblr)
-const reblogTime = 2; //1 minute for 1 reblog
+const reblogTime = 60; //default: 1 minute for 1 reblog
 
-const DEBUG_MODE = true; //set to false in real thing :3
+const DEBUG_MODE = true; //when true, this will mean all outputs from the bot are in the terminal, rather than in twitch chat 
+                         //set to false in real thing
 
 //------------------------- CODE -------------------------//
 const fs = require('fs');
