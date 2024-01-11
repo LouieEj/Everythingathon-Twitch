@@ -49,7 +49,14 @@ var reverseTimer = false;
 const timeScript = require('./timeScript');
 function addToTimer(time){
     console.log(`Adding ${time * happyHourMultiplier} seconds to the timer...`)
-    timeScript.addTime((time * happyHourMultiplier) + 1); //1 second added to any time so actual time gets added (as 1 second will pass before gets triggered)
+    if (timerSpeed == 1000){
+        timeScript.addTime((time * happyHourMultiplier) + 1); //1 second added to any time so actual time gets added (as 1 second will pass before gets triggered)
+                                                              //this does unfortunately add X more seconds when a lot of time is added at once (e.g. 10 extra seconds for 10 gifted subs)
+                                                              //due to the fact that this script aims to remain as efficient and simple to understand, this minor issue hasn't been solved
+    }
+    else{
+        timeScript.addTime((time * happyHourMultiplier)); //no more time added as timer slow enough for the 1 second difference to not make an effect
+    }
 }
 
 //Update time loop (every X seconds, determined by timerSpeed [default = 1000ms/1 second])
@@ -82,6 +89,12 @@ tmi.on('chat', (channel, tags, message) => {
     //Check if user is a standard user
     if (tags.badges == undefined){
         return;
+    }
+    if (tags.badges.vip){
+        //VIP only allowed to use !continue command for gartic on stream
+        if (message.split(' ')[0].toLowerCase() == "!continue"){
+            tmi.say(channel, "!continue");
+        }
     }
 
     if (tags.badges.broadcaster || tags.badges.moderator){
@@ -387,6 +400,15 @@ tmi.on('chat', (channel, tags, message) => {
                 else tmi.say(channel, "ERROR: Please input a valid username!")
             }
         }
+
+        if (message.split(' ')[0].toLowerCase() == "!continue"){
+            if (tags.badges.broadcaster){
+                return;
+            }
+            else{
+                tmi.say(channel, "!continue");
+            }
+        }
     }
 })
 
@@ -512,8 +534,7 @@ function startListener(){
                     addToTimer(secondsPerViewerFromRaid * e.viewers);
                 }
                 else{
-                    if (DEBUG_MODE) console.log(`No time added for the raid from ${e.raidingBroadcasterDisplayName} as not enough viewers were part of the raid!`)
-                    else tmi.say(channel, `No time added for the raid from ${e.raidingBroadcasterDisplayName} as not enough viewers were part of the raid!`)
+                    console.log(`No time added for the raid from ${e.raidingBroadcasterDisplayName} as not enough viewers were part of the raid!`)
                 }
             }
         })
